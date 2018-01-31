@@ -1,0 +1,22 @@
+---
+- name: Testing NetBox
+  hosts: 127.0.0.1
+  gather_facts: False
+  user: root
+  become: yes
+
+  tasks:
+
+    - name: adding a VM to netbox
+      netbox_ansible:
+        netbox_url: 'http://10.7.20.88:8000'
+        netbox_apitoken: 'a6d9a8e71a1c7cfc96475f1c2baac23d55841ed8'
+        vm_name: 'test-vm-awxxnsible-0'
+        cluster_name: 'az2'
+        ip_addresses: 
+        - vrf: 'Encore'
+          ip: '13.23i.118.18/24'
+        - vrf: 'Encore'
+          ip: '13.1.171.17/24'
+        - vrf: 'Encore'
+          ip: '15.9.191.19/24'
