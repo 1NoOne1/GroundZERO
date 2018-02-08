@@ -34,7 +34,7 @@
 
     - name: set fact
       set_fact:
-         line: "{{inventory_hostname}};{{mac.stdout}};{{inventory_hostname.split('-')[0]}};{{domain_name}};{{management_vlan_id}};{{management_ip}};{{management_netmask}};{{management_gateway}};{{p_dns}};{{s_dns}}"
+         line: "{{inventory_hostname}};{{mac_addr.stdout}};{{inventory_hostname.split('-')[0]}};{{domain_name}};{{management_vlan_id}};{{management_ip}};{{management_netmask}};{{management_gateway}};{{p_dns}};{{s_dns}}"
     - debug: var=line
 
     - name: put contents of line into file
