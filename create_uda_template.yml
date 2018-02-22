@@ -1,0 +1,50 @@
+---
+- name: This is to create the UDA Kickstart subtemplate file
+  hosts: all
+  gather_facts: False
+  user: root
+  become: yes
+  vars:
+    awk: "awk -F= '{print $2}'"
+    domain_name: 'sbcuc.net'
+    management_vlan_id: '604'
+    management_netmask: '255.255.255.0'
+    management_gateway: '10.235.36.1'
+    p_dns: '0.0.0.0'
+    s_dns: '1.1.1.1'
+
+  tasks:
+    - name: Get MGMT IP from iDrac IP
+      set_fact:
+         management_ip: "{{ ansible_host|regex_replace('([0-9]+[.][0-9]+)[.][0-9]+[.]([0-9]+)', '\\1.36.\\2') }}"
+    #- debug: var=management_ip
+    
+    - name: get sys info
+      raw: racadm getsysinfo -s
+      register: sysinfo
+    - debug: var=sysinfo.stdout_lines
+
+    - name: Extract the Nic1-3-1 Mac Address
+      connection: local
+      shell: 'echo -e "{{sysinfo.stdout}}" | grep -E "1-3-1" | {{ awk }} | sed "s/^ *//"'
+      register: mac_addr
+    - debug: var=mac_addr.stdout
+
+#SUBTEMPLATE;MAC;HOSTNAME;DOMAIN;MGMT_VLAN;MGMT_IP;MGMT_MASK;DEF_GW;DNS1;DNS2
+
+    - name: set fact
+      set_fact:
+         line: "{{inventory_hostname}};{{mac_addr.stdout}};{{inventory_hostname.split('-')[0]}};{{domain_name}};{{management_vlan_id}};{{management_ip}};{{management_netmask}};{{management_gateway}};{{p_dns}};{{s_dns}}"
+    - debug: var=line
+
+    - name: put contents of line into file
+      connection: local
+      lineinfile:
+        path: /tmp/uda_ks_template.cfg
+        mode: 0777
+        create: yes
+        line: "{{ line}}"
+        state: present
+
+##if the playbook failes with Aborting and selinx errors, follow the hack in the below link.
+##https://dmsimard.com/2016/01/08/selinux-python-virtualenv-chroot-and-ansible-dont-play-nice/

@@ -15,7 +15,7 @@
         cluster_name: 'az2'
         ip_addresses: 
         - vrf: 'Encore'
-          ip: '13.23i.118.18/24'
+          ip: '13.23.118.18/24'
         - vrf: 'Encore'
           ip: '13.1.171.17/24'
         - vrf: 'Encore'
